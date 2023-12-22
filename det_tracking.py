@@ -5,17 +5,49 @@ import numpy as np
 from ultralytics import YOLO
 import math
 from face import FaceDetection
+from flask import Flask,render_template,session,request,redirect, url_for
+
+app = Flask(__name__)
+
+# Set the secret key to some random bytes. Keep this really secret!
+app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
+
+@app.route('/')
+def index():
+    if 'username' in session:
+        return f'Logged in as {session["username"]}'
+    return redirect(url_for('login'))
+
+
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        if request.form['username'] == 'admin' and request.form['password'] == 'admin':
+            session['username'] = request.form['username']
+            return redirect(url_for('index'))   
+    if request.method == 'GET': 
+        return render_template('login.html')
+
+@app.route('/logout')
+def logout():
+    # remove the username from the session if it's there
+    session.pop('username', None)
+    return redirect(url_for('index'))
+
+if __name__ == "__main__":
+    app.run()
 
 # Tải lên mô hình nhận diện đối tượng
 model = YOLO('yolov8n.pt') # model này dùng để nhận diện đối tượng Person
 model2 = YOLO('best.pt') # model này dùng để nhận diện đối tượng Garbage
 
 # Tải lên mô hình nhận diện khuôn mặt
-face = FaceDetection(r"D:/yolov8/faceData", r"D:/yolov8/encodeImage.pkl")
+face = FaceDetection(r"D:/yolov8/static/faceData", r"D:/yolov8/encodeImage.pkl")
 face.KhoiTao()
 
 # Lấy video đầu vào, truyền vào biến cap
-cap = cv2.VideoCapture("testing.mp4")
+cap = cv2.VideoCapture(1)
 
 # Lấy kích thước video
 width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
@@ -60,9 +92,6 @@ dumped = [] # Bounding box của đối tượng xả rác
 while cap.isOpened():
     success, frame = cap.read() # đọc dữ liệu đầu vào từ camera
     annotated_frame = frame
-    frame_cp = frame
-    
-    cv2.imwrite(f"crop/{len(crop)}.jpg", frame_cp) 
 
     if success:
         # nhận diện đối tượng có nhãn Person
@@ -104,14 +133,14 @@ while cap.isOpened():
                 box = person[i][2]
                 x1, y1, x2, y2 = map(int, box)
                 
-                crop_img = frame_cp[y1-50:y2+50,x1-50:x2+50] # lưu lại ảnh đối tượng
+                crop_img = frame[y1-50:y2+50,x1-50:x2+50] # lưu lại ảnh đối tượng
                 crop.append(crop_img)
                 
                 info = face.detect(crop_img)
                 name = "Unknown"
                 if len(info) > 0:
                     name = info[0]
-                cv2.imwrite(f"crop/{name}id{len(crop)}.jpg", crop_img)
+                cv2.imwrite(f"static/crop/{name}id{len(crop)}.jpg", crop_img)
                 
                 dumped.append(i)
                 pop.append(i)    
