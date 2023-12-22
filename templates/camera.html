@@ -4,9 +4,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Video Streaming</title>
+    <link rel="stylesheet" href="/static/css/main.css">
 </head>
 <body>
-    <h1>Live Video Streaming</h1>
-    <img src="{{ url_for('video_feed') }}" width="640" height="480" />
+    <div class="flex">
+        <div class="left">
+            <h1>Live Video Streaming</h1>
+            <img src="{{ url_for('video_feed') }}" width="640" height="480" />
+        </div>
+        <div class="right">
+            <table class="styled-table">
+                <thead>
+                    <tr>
+                        <th>Mã sinh viên</th>
+                        <th>Tên</th>
+                        <th>Ngày sinh</th>
+                        <th>Quê quán</th>
+                        <th>Lớp</th>
+                    </tr>
+                </thead>
+                <tbody id="abc">
+                    <!-- and so on... -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    
 </body>
+<script src="/static/js/table.js"></script>
 </html>

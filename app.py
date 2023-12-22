@@ -5,6 +5,10 @@ import numpy as np
 from ultralytics import YOLO
 import math
 from face import FaceDetection
+import pandas as pd
+from person import Person
+
+dt = pd.read_excel("data.xlsx")
 
 app = Flask(__name__)
 
@@ -14,13 +18,21 @@ app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
 @app.route('/')
 def index():
     if 'username' in session:
-        return render_template('home.html')
-    return redirect(url_for('login'))
-
-@app.route('/camera')
-def camera():
-    if session['username']:
         return render_template('camera.html')
+    return redirect(url_for('login'))
+        
+@app.route('/data_table')
+def data_table():
+    person_list = []
+    for index, row in dt.iterrows():
+        person_list.append({
+            'ten':row['MSV'],
+            'msv':row['Name'],
+            'ngaysinh':row['Dob'],
+            'diachi':row['Address'],
+            'lop':row['Class']
+        })
+    return person_list
 
 @app.route('/video_feed')
 def video_feed():
