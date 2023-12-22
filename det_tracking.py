@@ -5,38 +5,38 @@ import numpy as np
 from ultralytics import YOLO
 import math
 from face import FaceDetection
-from flask import Flask,render_template,session,request,redirect, url_for
+# from flask import Flask,render_template,session,request,redirect, url_for
 
-app = Flask(__name__)
+# app = Flask(__name__)
 
-# Set the secret key to some random bytes. Keep this really secret!
-app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
+# # Set the secret key to some random bytes. Keep this really secret!
+# app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
 
-@app.route('/')
-def index():
-    if 'username' in session:
-        return f'Logged in as {session["username"]}'
-    return redirect(url_for('login'))
+# @app.route('/')
+# def index():
+#     if 'username' in session:
+#         return f'Logged in as {session["username"]}'
+#     return redirect(url_for('login'))
 
 
 
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        if request.form['username'] == 'admin' and request.form['password'] == 'admin':
-            session['username'] = request.form['username']
-            return redirect(url_for('index'))   
-    if request.method == 'GET': 
-        return render_template('login.html')
+# @app.route('/login', methods=['GET', 'POST'])
+# def login():
+#     if request.method == 'POST':
+#         if request.form['username'] == 'admin' and request.form['password'] == 'admin':
+#             session['username'] = request.form['username']
+#             return redirect(url_for('index'))   
+#     if request.method == 'GET': 
+#         return render_template('login.html')
 
-@app.route('/logout')
-def logout():
-    # remove the username from the session if it's there
-    session.pop('username', None)
-    return redirect(url_for('index'))
+# @app.route('/logout')
+# def logout():
+#     # remove the username from the session if it's there
+#     session.pop('username', None)
+#     return redirect(url_for('index'))
 
-if __name__ == "__main__":
-    app.run()
+# if __name__ == "__main__":
+#     app.run()
 
 # Tải lên mô hình nhận diện đối tượng
 model = YOLO('yolov8n.pt') # model này dùng để nhận diện đối tượng Person
@@ -47,7 +47,7 @@ face = FaceDetection(r"D:/yolov8/static/faceData", r"D:/yolov8/encodeImage.pkl")
 face.KhoiTao()
 
 # Lấy video đầu vào, truyền vào biến cap
-cap = cv2.VideoCapture(1)
+cap = cv2.VideoCapture("testing.mp4")
 
 # Lấy kích thước video
 width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))

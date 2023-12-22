@@ -54,7 +54,7 @@ face = FaceDetection(r"D:/yolov8/static/faceData", r"D:/yolov8/encodeImage.pkl")
 face.KhoiTao()
 
 # Lấy video đầu vào, truyền vào biến cap
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(1)
 
 # Lấy kích thước video
 width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
@@ -96,6 +96,21 @@ crop = [] # Ảnh của đối tượng xả rác sẽ được trích xuất
 dumped = [] # Bounding box của đối tượng xả rác
 
 def generate_frames():
+    vid_writer = cv2.VideoWriter(
+        'result.mp4',
+        cv2.VideoWriter_fourcc(*'mp4v'), 
+        30, (width, height))
+    warning_distance = 150
+    change = 50
+    # Khởi tạo một số danh sách cần thiết
+    person = {} # Lưu trữ đối tượng người
+    garbage = {} # Lưu trữ đối tượng rác thải
+    warning = {} # Lưu trữ đối tượng nằm trong diện cảnh báo, nghi ngờ, cần được theo dõi
+    classes = ["Person","Garbage"] # Label
+
+    crop = [] # Ảnh của đối tượng xả rác sẽ được trích xuất
+    dumped = [] # Bounding box của đối tượng xả rác
+    
     while True:
         success, frame = cap.read() # đọc dữ liệu đầu vào từ camera
         annotated_frame = frame
@@ -153,13 +168,12 @@ def generate_frames():
                     pop.append(i)    
             for i in pop:
                 warning.pop(i)
+            
+            vid_writer.write(annotated_frame)
                 
-        
-            # success, frame = camera.read()
-            # if not success:
-            #     break
-            # else:
             ret, tmp_frame = cv2.imencode('.jpg', annotated_frame)
             frame = tmp_frame.tobytes()
             yield (b'--frame\r\n'
                     b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')  # ngăn cách các frame bằng boundary
+    vid_writer.release()
+    cap.release()
